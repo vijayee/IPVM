@@ -41,11 +41,22 @@ func (a *API) add(k string) {
 
 //Define a new module  with dependencies at pkg namespace
 func (a *API)Define(deps []string, pkg string, name string, value interface {}){
-	if (typedef(value) != reflect.Func){
+	//only functions have dependencies
+	if typedef(value) != "func"{
 		a.Define(pkg, name, value)
+		return
+	}
+	t := reflect.TypeOf(value)
+	//abort if function does not have enough parameters to receive dependencies
+	if t.NumIn() < len(deps){
+		return
+	}
+	//does not support multiple return values
+	if t.NumOut() > 1){
+		return
 	}
 	init()
-	if (!a.contains(pkg)){
+	if !a.contains(pkg){
 		a.add(pkg)
 	}
 	a.registry[pkg].define(deps, name, value)
@@ -60,28 +71,57 @@ func (a *API)Define(pkg string, name string, value interface {}){
 }
 
 func (a *API) Require(pkg string, name string) vm.value {
-	var d []interface{}
+	var d map[string]interface{}
 	mdl:= registry[pkg].require(name)
 	deps:= mdl.Dependencies
-	for dep:= range deps.ToSlice(){
-		d[len(d)++] := a.require(newDeps,pkg,dep)
+	ds:= deps.ToSlice()
+	val := reflect.ValueOf(mdl.Exports)	
+	typ := reflect.TypeOf(mdl.Exports)
+	n:= typ.NumIn() 
+	for _ , dep:= range ds{
+		d[dep] := a.require(newDeps,pkg,dep, d)
 	}
-
+	vmmdl:= func(call otto.FunctionCall) vm.Value { 
+		if(n != len(args.ArgumentList))
+		if mdl.ModuleType == "func" {
+			if(len(ds) > 0){
+				
+			else{				
+				if n != len(call.ArgumentList)
+				{
+					return vm.toValue(nil)
+				}
+				else{
+					var p []reflect.Value
+					for i, arg := range.ArgumentList{
+						p[i]:= reflect.ValueOf(arg.export())						
+					}
+					for i:= 0; i < n; i++{
+						
+					}
+				}
+			}
+		}
+		else{
+			return vm.toValue(mdl.Exports)
+		}
+	}
 	return vm.ToValue(registry[pkg].require(name))
 
 }
-func(a *API) require(deps *Set, pkg string, name string, d []interface{}) interface{}{
+func(a *API) require(deps *Set, pkg string, name string,  map[string]interface{}) interface{}{
 	mdl:= registry[pkg].require(name, value)
 
 	newDeps := deps.Union(mdl.Dependencies)
 	for dep:= range deps.Difference(mdl.Dependencies).ToSlice(){
-		d[len(d)++] := a.require(newDeps,dep)
+		d[dep] := a.require(newDeps,dep)
 	}
+	newDeps
 }
 func (a *API) set(k string, v interface {}){
 	a.registry[k]= &module{}
 }
-func typedef( value interface{}) string{
-	value := reflect.ValueOf(value)
-	return value
+func typedef(value interface{}) string {
+	t := reflect.ValueOf(value)
+	return t.Kind().String()
 }
