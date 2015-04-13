@@ -3,6 +3,7 @@ import(
 	vm "github.com/robertkrimen/otto"
 	"error"
 	"github.com/deckarep/golang-set"
+	"reflect"
 )
 
 //Holds all api's in individual namespaces
@@ -40,6 +41,9 @@ func (a *API) add(k string) {
 
 //Define a new module  with dependencies at pkg namespace
 func (a *API)Define(deps []string, pkg string, name string, value interface {}){
+	if (typedef(value) != reflect.Func){
+		a.Define(pkg, name, value)
+	}
 	init()
 	if (!a.contains(pkg)){
 		a.add(pkg)
@@ -60,7 +64,7 @@ func (a *API) Require(pkg string, name string) vm.value {
 	mdl:= registry[pkg].require(name)
 	deps:= mdl.Dependencies
 	for dep:= range deps.ToSlice(){
-		d[len(d)++] := a.require(newDeps,pkg dep)
+		d[len(d)++] := a.require(newDeps,pkg,dep)
 	}
 
 	return vm.ToValue(registry[pkg].require(name))
@@ -76,4 +80,8 @@ func(a *API) require(deps *Set, pkg string, name string, d []interface{}) interf
 }
 func (a *API) set(k string, v interface {}){
 	a.registry[k]= &module{}
+}
+func typedef( value interface{}) string{
+	value := reflect.ValueOf(value)
+	return value
 }
