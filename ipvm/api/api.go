@@ -125,3 +125,14 @@ func typedef(value interface{}) string {
 	t := reflect.ValueOf(value)
 	return t.Kind().String()
 }
+
+func parameterize(call otto.FunctionCall, method reflect.Value) []reflect.Value {
+	m := method.Type()
+	var a []reflect.Value
+	a = make([]reflect.Value, m.NumIn(), m.NumIn())
+	for i := 0; i < m.NumIn(); i++ {
+		arg, _ := call.Argument(i).Export()
+		a[i] = reflect.ValueOf(arg).Convert(m.In(i))
+	}
+	return a
+}
