@@ -136,3 +136,44 @@ func parameterize(call otto.FunctionCall, method reflect.Value) []reflect.Value 
 	}
 	return a
 }
+/*
+// Sandbox
+package main
+
+import (
+	"github.com/robertkrimen/otto"
+	"reflect"
+)
+
+func parameterize(call otto.FunctionCall, method reflect.Value) []reflect.Value {
+	m := method.Type()
+	var a []reflect.Value
+	a = make([]reflect.Value, m.NumIn(), m.NumIn())
+	for i := 0; i < m.NumIn(); i++ {
+		arg, _ := call.Argument(i).Export()
+		a[i] = reflect.ValueOf(arg).Convert(m.In(i))
+	}
+	return a
+}
+
+func main() {
+	vm := otto.New()
+	tester := func(arg string) string {
+		return arg
+	}
+
+	require := func(call otto.FunctionCall) otto.Value {
+		t := reflect.ValueOf(tester)
+		a := parameterize(call, t)
+		v := reflect.ValueOf(tester)
+		r := v.Call(a)
+
+		result, _ := otto.ToValue(r[0].Convert(t.Type().Out(0)))
+		return result
+	}
+
+	vm.Set("require", require)
+	vm.Run("console.log(require('stuff'))")
+}
+
+*/
