@@ -1,6 +1,7 @@
 package ipvm
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -9,31 +10,34 @@ type testData struct {
 	output interface{}
 }
 
-var testSetData map[string]testData, objArray map[string]Object
+var testSetData map[string]testData
+var objArray map[string]*Object
 
 func TestSetObject(t *testing.T) {
 	for tk, d := range testSetData {
-		testObj := new(Object)
-		err := testObj.Set(d.input)
+		objArray[tk] = new(Object)
+		err := objArray[tk].Set(d.input)
 		if err != nil {
-			t.Error("Error occurred on ", tk, ": ", err.Error())
+			t.Errorf("Set() Error occurred on %s: %s", tk, err.Error())
+
 		}
+		fmt.Printf("%s was Set() succesfully \n", tk)
 	}
 
 }
 func TestGetObject(t *testing.T) {
-	for tk, d := range testSetData {
-		testObj := new(Object)
-		err := testObj.Set(d.input)
+	for tk, d := range objArray {
+		_, err := d.Get()
 		if err != nil {
-			t.Error("Error occurred on ", tk, ": ", err.Error())
+			t.Errorf("Get() Error occurred on %s: %s", tk, err.Error())
 		}
+		fmt.Printf("%s was Get() succesfully  of object %s\n", tk)
 	}
 
 }
 func TestMain(m *testing.M) {
 	testSetData = make(map[string]testData)
-	objArray = make(map[string]Object)
-	testSetData["stringTest"] = testData{"something", nil}
-	testSetData["boolTest"] = testData{false, nil}
+	objArray = make(map[string]*Object)
+	testSetData["stringTest"] = testData{"something", "something"}
+	testSetData["boolTest"] = testData{false, false}
 }
