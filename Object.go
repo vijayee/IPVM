@@ -9,6 +9,11 @@ type Object struct {
 	value vm.Value
 }
 
+//define an interface for which an api may include objects consistently
+type Objecter interface {
+	Object() Object
+}
+
 //return the interface of the value
 func (o *Object) Get() (interface{}, error) {
 	return o.value.Export()
@@ -62,34 +67,42 @@ func (o *Object) IsDefined() bool {
 	return o.value.IsDefined()
 }
 
+// IsFunction will return true if value is a function.
 func (o *Object) IsFunction() bool {
 	return o.value.IsFunction()
 }
 
+// IsNaN will return true if value is NaN (or would convert to NaN).
 func (o *Object) IsNaN() bool {
 	return o.value.IsNaN()
 }
 
+// IsNull will return true if the value is null, and false otherwise.
 func (o *Object) IsNull() bool {
 	return o.value.IsNull()
 }
 
+// IsNumber will return true if value is a number (primitive).
 func (o *Object) IsNumber() bool {
 	return o.value.IsNumber()
 }
 
+// IsObject will return true if value is an object.
 func (o *Object) IsObject() bool {
 	return o.value.IsObject()
 }
 
+// IsPrimitive will return true if value is a primitive (any kind of primitive)
 func (o *Object) IsPrimitive() bool {
 	return o.value.IsPrimitive()
 }
 
+// IsString will return true if value is a string (primitive).
 func (o *Object) IsString() bool {
 	return o.value.IsString()
 }
 
+// IsUndefined will return true if the value is undefined, and false otherwise.
 func (o *Object) IsUndefined() bool {
 	return o.value.IsUndefined()
 }
