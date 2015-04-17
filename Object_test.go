@@ -35,9 +35,21 @@ func TestGetObject(t *testing.T) {
 	}
 
 }
+func TestDefineApi(t *testing.T) {
+	for tk, d := range objArray {
+		err := Define(tk, d)
+		if err != nil {
+			t.Errorf("Define() Error occurred on %s: %s", tk, err.Error())
+		}
+		fmt.Printf("%s was Define() succesfully  of object %s\n", tk)
+	}
+
+}
 func TestMain(m *testing.M) {
 	testSetData = make(map[string]testData)
 	objArray = make(map[string]*Object)
 	testSetData["stringTest"] = testData{"something", "something"}
 	testSetData["boolTest"] = testData{false, false}
+	function := func(param string) {}
+	testSetData["funcTest"] = testData{function, nil}
 }
